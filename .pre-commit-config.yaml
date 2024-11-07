@@ -1,0 +1,18 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.3.0  # specify the version to use
+    hooks:
+      - id: trailing-whitespace  # removes trailing whitespace
+      - id: end-of-file-fixer    # ensures files end with a newline
+      - id: check-yaml           # checks YAML files
+      - id: check-json           # checks JSON files
+
+  - repo: https://github.com/psf/black
+    rev: 23.1.0  # use the latest stable version
+    hooks:
+      - id: black  # code formatter for Python
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.1.0
+    hooks:
+      - id: flake8  # linter for Python

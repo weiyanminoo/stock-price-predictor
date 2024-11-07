@@ -3,9 +3,9 @@ venv/
 
 # ignore pythonn cache and compiled files
 __pycache__/
-*.pyc 
+*.pyc
 
-.env 
+.env
 
 # ignore data folder
 data/
