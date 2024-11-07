@@ -1,0 +1,13 @@
+# ignore virtual environment folder
+venv/
+
+# ignore pythonn cache and compiled files
+__pycache__/
+*.pyc 
+
+.env 
+
+# ignore data folder
+data/
+
+.pytest_cache/
