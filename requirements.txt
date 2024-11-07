@@ -2,3 +2,4 @@ yfinance
 pandas
 scikit-learn
 pytest
+psycopg2-binary
