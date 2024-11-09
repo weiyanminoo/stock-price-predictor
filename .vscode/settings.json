@@ -1,3 +1,6 @@
 {
-    "python.testing.cwd": "tests"
+    "python.testing.cwd": "tests",
+    "python.analysis.extraPaths": [
+        "./src/data_collection"
+    ]
 }
