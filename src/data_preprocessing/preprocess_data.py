@@ -2,6 +2,7 @@ import logging
 from sqlalchemy import create_engine
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
+from src.data_preprocessing.create_labels import create_labels
 
 # connection string
 connection_string = (
@@ -19,10 +20,8 @@ def load_data_from_db(engine, ticker):
 
 def preprocess_data(data):
     """Preprocess the stock data for model training."""
-    # convert date to datetime
+    # convert date to datetime and set as index
     data["date"] = pd.to_datetime(data["date"])
-
-    # set the date as the index for time-series processing
     data.set_index("date", inplace=True)
 
     # handle missing values - forward fill or interpolate
@@ -33,13 +32,38 @@ def preprocess_data(data):
     data["is_month_start"] = data.index.is_month_start.astype(int)
     data["is_month_end"] = data.index.is_month_end.astype(int)
 
+    # calculate technical indicators
+    data["SMA_7"] = (
+        data["close"].rolling(window=7).mean()
+    )  # 7-day Simple Moving Average
+    data["SMA_21"] = (
+        data["close"].rolling(window=21).mean()
+    )  # 21-day Simple Moving Average
+    data["volatility"] = (
+        data["close"].rolling(window=7).std()
+    )  # 7-day rolling standard deviation (volatility)
+    data["momentum"] = data["close"].diff(7)  # 7-day momentum
+
     # drop ticker column
     data.drop(columns=["ticker"], inplace=True)
 
     # standardize numerical columns
     scaler = StandardScaler()
-    numerical_columns = ["open", "high", "low", "close", "volume"]
+    numerical_columns = [
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "SMA_7",
+        "SMA_21",
+        "volatility",
+        "momentum",
+    ]
     data[numerical_columns] = scaler.fit_transform(data[numerical_columns])
+
+    # drop rows with NaN values created by rolling windows
+    data.dropna(inplace=True)
 
     return data
 
@@ -66,8 +90,12 @@ def main():
         raw_data = load_data_from_db(engine, ticker)
         preprocessed_data = preprocess_data(raw_data)
 
+        # call create_labels to generate labels
+        labels = create_labels(preprocessed_data)
+        preprocessed_data["label"] = labels
+
         print(preprocessed_data.head())
-        # Do not need to manually close the engine, it's managed by SQLAlchemy
+        engine.dispose()
 
 
 if __name__ == "__main__":
