@@ -2,7 +2,7 @@ import logging
 from sqlalchemy import create_engine
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
-from src.data_preprocessing.create_labels import create_labels
+from .create_labels import create_labels
 
 # connection string
 connection_string = (
